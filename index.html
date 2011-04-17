@@ -1,0 +1,94 @@
+<!doctype html>
+<html> 
+<head> 
+<title>nowjs test</title> 
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script> 
+<script src="/nowjs/now.js"></script>
+<script src="/static/game.js"></script>
+<script src="/static/draw.js"></script>
+<script src="/static/constants.js"></script>
+<script>
+$(document).ready(function(){
+  board = new Board(6, 7);
+  
+  now.name = "Zach";//prompt("What's your name?", ""); 
+  now.game = "C4"; 
+  now.room = "3";
+  now.color = "#" + Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10);
+  
+  now.receiveMessage = function(name, message, color){
+    $("#messages").append("<br><span style='color:" + (color || "#111") + ";'>" + name + "</span>: " + message);
+  }
+  
+  now.receiveBoard = function(b){
+    board = b;
+    $("table.board").detach();
+    $("div#board").append(drawBoard(board));
+  }
+  
+  now.addUser = function(name, color){
+    $("div#playerlist").append($("<span class='playertag' style='background-color:"+color+";'>" + name + "</span>"));
+  }
+  
+  now.rmUser = function(color){
+    console.log(color);
+    $("span[style*='"+color+"']").detach();
+  }
+  
+  $("#send-button").click(function(){
+    now.distributeMessage($("#text-input").val());
+    $("#text-input").val("");
+  });
+
+
+  
+  $("td").live("click", function(ev){
+    var l = $(ev.target).data("p");
+    console.log(l);
+    var p = new Piece();
+    p.color = now.color;
+    
+    var m = new Move(p, l[0], l[1]);
+    now.distributeMove(m);
+  });
+  
+  $("span#colormarker").css("background-color", now.color);
+});
+</script>
+<style>
+table.board {
+    
+}
+table.board tr {
+
+}
+table.board td {
+    width: 25px;
+    height: 25px;
+    padding: 0px;
+    margin: 0px;
+    border: 1px solid black;
+}
+div.piece {
+    width: 21px;
+    height: 21px;
+    margin: 2px;
+}
+span.playertag {
+    padding: 2px;
+    margin: 3px;
+}
+</style>
+</head> 
+ 
+<body> 
+<div id="board"></div>
+
+<span id="colormarker">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<input type="text" id="text-input"> <input type="button" value="Send" id="send-button">
+<div id="playerlist"></div>
+<div id="messages"></div>
+
+
+</body> 
+</html> 
